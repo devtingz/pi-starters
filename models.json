@@ -1,0 +1,90 @@
+{
+  "providers": {
+    "llamacpp": {
+      "baseUrl": "http://127.0.0.1:8080/v1",
+      "api": "openai-completions",
+      "apiKey": "llamacpp",
+      "models": [
+        { "id": "unsloth/gemma-4-E4B-it-GGUF:Q5_K_M" },
+        { "id": "gemma-4-E4B-it-GGUF:Q5_K_M" }
+      ]
+    },
+    "Xiaomi": {
+      "baseUrl": "https://token-plan-sgp.xiaomimimo.com/v1",
+      "apiKey": "sk-sg88alyhvbdter52synpgui2wbi8segomqmarr4g0ahmy0eu",
+      "api": "openai-completions",
+      "models": [
+        {
+          "id": "mimo-v2.5-pro",
+          "name": "Xiaomi: MiMo-V2-Pro (Xiaomi Subscript)",
+          "reasoning": true,
+          "input": ["text"]
+        },
+        {
+          "id": "mimo-v2.5",
+          "name": "Xiaomi: MiMo-V2.5 Normal (Xiaomi Subscript)",
+          "reasoning": true,
+          "input": ["text"]
+        },
+        {
+          "id": "mimo-v2.5-tts",
+          "name": "Xiaomi: MiMo-V2.5 TTS (Xiaomi Subscript)",
+          "reasoning": true,
+          "input": ["text"]
+        }
+      ]
+    },
+    "openrouter": {
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKey": "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",
+      "api": "openai-completions",
+      "models": [
+        {
+          "id": "nex-agi/nex-n2-pro:free",
+          "name": "Nex N2 Pro FREE [OpenRouter]",
+          "reasoning": false,
+          "input": ["text"],
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        }
+      ],
+      "modelOverrides": {
+        "inclusionai/ling-2.6-flash": {
+          "name": "Ling 2.6 Flash [OR]",
+          "compat": {
+            "openRouterRouting": {
+              "allow_fallbacks": true,
+              "require_parameters": false,
+              "data_collection": "deny",
+              "zdr": true,
+              "enforce_distillable_text": false,
+              "ignore": [
+                "gmicloud",
+                "friendli",
+                "anthropic",
+                "amazon-bedrock",
+                "google-vertex"
+              ],
+              "sort": {
+                "by": "price",
+                "partition": "model"
+              },
+              "max_price": {
+                "prompt": 0.8,
+                "completion": 3.5
+              },
+              "preferred_min_throughput": {
+                "p50": 100,
+                "p90": 50
+              },
+              "preferred_max_latency": {
+                "p50": 1,
+                "p90": 3,
+                "p99": 5
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
