@@ -27,8 +27,16 @@ const SUBAGENT_SESSION_PREFIXES = [
 /**
  * Global hints file path.
  * This file contains hints that apply to ALL projects.
+ * Default: C:\Users\Coffee Shops Coder\.pi\agent\.pihints-global
  */
 const GLOBAL_HINTS_FILE_PATH = join(homedir(), ".pi", "agent", ".pihints-global");
+
+const CONSTANT_REMINDER =  "Remember: **Never** assume or guess at an API name, method name, CSS selector, Object Property name, or function signature -- always verify!  Avoid assumptions as much as practicable -- when simple verifications are available, DO THE VERIFICATION instead of proceeding based on assumptions.  Separate “I haven’t verified it” from “it does not exist.”  ALWAYS prefer the read, edit, and write tools for file handling -- there is only one exception: if you experience errors when writing XML to a file.  Avoid relying on alternatives to the read or write or edit tools -- use of alternatives should be **VERY** rare. If you attempt the `edit` tool and receive an error such as \"Could not find the exact text...\" or \"Could not find edits[0] in\" then FIX THE TOOL CALL PARAMETERS for the `edit` tool and retry the `edit` tool.  All code changes must be thoroughly tested and fully validated before considering them complete. Please continue handling the current request...";
+
+/**
+ * Interval for CONSTANT_REMINDER hints injection (during agent turns).
+ */
+const TURN_INJECTION_INTERVAL = 10;
 
 /**
  * Interval for GLOBAL hints injection (in agent_start events).
@@ -287,6 +295,9 @@ export default function (pi: ExtensionAPI) {
     },
   };
 
+  // ── Turn counter for periodic steer injection ──
+  let turnStartCount = 0;
+
   // ========================================================================
   // AUTO-INIT SEQUENCE STATE (session_start -> agent_end)
   // ========================================================================
@@ -490,6 +501,29 @@ export default function (pi: ExtensionAPI) {
       globalHintsPending = false;
       projectHintsPending = false;
     }
+  });
+
+  // ── turn_start handler: periodic steer injection ──
+  pi.on("turn_start", async (_event, ctx) => {
+    turnStartCount++;
+    if (turnStartCount % TURN_INJECTION_INTERVAL === 2) {
+      pi.sendMessage(
+        {
+          customType: "pi-hints-ping",
+          content: `${CONSTANT_REMINDER}`,
+          display: true,
+        },
+        { deliverAs: "steer" }
+      );
+      if (state.config.verbose) {
+        console.log("[pi-hints] Steer injected at turn #" + turnStartCount);
+      }
+    }
+  });
+
+  // ── agent_end handler: reset turn counter ──
+  pi.on("agent_end", async () => {
+    turnStartCount = 0;
   });
 
   // ── agent_end handler: init-sequence cleanup ──
